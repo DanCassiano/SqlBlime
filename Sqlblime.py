@@ -20,27 +20,41 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 
 	def run(self, edit):		
 
-		temSelecao = self.get_selecao()	
+		temSelecao = self.get_selecao()		
+		# self.nova_aba(self,"novo")
+		self.window = self.view.window()
+		output = self.window.create_output_panel("variable_get")
+		output.run_command('erase_view')
+		output.run_command('append', {'characters': temSelecao})
+		output.set_syntax_file("Packages/Text/SQL Sql.tmLanguage")
+		self.window.run_command("show_panel", {"panel": "output.variable_get"})
 
-		if temSelecao != "":
-			self.variaveis = self.get_php_var(temSelecao)		
-			self.query = temSelecao
-			# dialogo para coletar dados
-			# self.dialog_var(self.dialog_var(self.variaveis[0]))
 
-			cont=0
+		# if temSelecao != "":
+		# 	self.variaveis = self.get_php_var(temSelecao)		
+		# 	self.query = temSelecao
+		# 	print( self.query)
 
-			while cont < 2:				
+		# 	# sublime.message_dialog("User said: " );
+		# 	# dialogo para coletar dados
+		# 	# self.dialog_var(self.dialog_var(self.variaveis[0]))
 
-				self.dialog_var( "sdasdasd" )
-				# print( self.variaveis[ cont-1 ] )				
+		# 	cont=0
+
+		# 	while cont < 2:				
+
+		# 		# self.dialog_var( self.variaveis[0] )
+		# 		# print( self.variaveis[ cont-1 ] )				
 				
-				cont += 1
+		# 		cont += 1
 
-			# self.replace_query( self.query )
-			print( self.variaveis )
+		# 	# self.replace_query( self.query )
+		# 	print( self.variaveis )
 
-
+	"""	
+		funcao que busca e analisa 
+		a string para verificar se ela contem 
+		uma query """
 	def get_selecao(self):
 
 		sels = self.view.sel()
@@ -52,7 +66,7 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 		return False
 
 	def is_SQL(self, sql):
-		dado = re.compile(r'FROM')
+		dado = re.compile(r'SELECT+', re.IGNORECASE)
 		
 		if( dado.search( sql ) ):
 			return True
@@ -121,6 +135,11 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 		janela.insert(edit, 0, stringDados )
 		janela.set_name("Consulta")
 		janela.set_encoding('utf-8')
+		janela.window.set_layout({
+    		"cols": [0, 0.5, 1],
+    		"rows": [0, 1],
+    		"cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+		})
 		self.window.active_view(janela)
 	
 	def on_retorno(self, user_input ):
