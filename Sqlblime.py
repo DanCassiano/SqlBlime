@@ -1,6 +1,8 @@
 import sublime, sublime_plugin, re
 import urllib.request
 import json
+import os
+import tempfile
 
 """ 
 	api de referencia
@@ -17,18 +19,17 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 	query       = ""
 	query_final = ""
 	edit        = None
+	configs 	= None
 
 	def run(self, edit):		
 
-		temSelecao = self.get_selecao()		
-		# self.nova_aba(self,"novo")
-		self.window = self.view.window()
-		output = self.window.create_output_panel("variable_get")
-		output.run_command('erase_view')
-		output.run_command('append', {'characters': temSelecao})
-		output.set_syntax_file("Packages/Text/SQL Sql.tmLanguage")
-		self.window.run_command("show_panel", {"panel": "output.variable_get"})
+		self.configs = self.loadConfigs()
+		# buscando na configuracao
+		print(self.configs.get('banco'))
+		temSelecao = self.get_selecao()
 
+		# self.nova_aba(self,"novo")
+		self.showPainel( temSelecao )
 
 		# if temSelecao != "":
 		# 	self.variaveis = self.get_php_var(temSelecao)		
@@ -128,7 +129,6 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 
 		self.nova_aba( edit, coluna )
 
-
 	def nova_aba(self, edit, stringDados ):
 
 		janela = self.view.window().new_file()
@@ -152,7 +152,6 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 		
 		# sublime.status_message( user_input )
 
-
 	def replace_query(self, query):
 
 		nova_query = ""
@@ -171,4 +170,23 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 	def msg_error(self, mensagem):	
 		sublime.error_message("Must be and error!")
 
-    
+	def showPainel( self, dados ):
+		self.window = self.view.window()
+		output = self.window.create_output_panel("consulta")
+		output.run_command('erase_view')
+		output.run_command('append', {'characters': dados})
+		output.set_syntax_file("Packages/SQL/SQL.tmLanguage")
+		self.window.run_command("show_panel", {"panel": "output.consulta"})
+
+	def loadConfigs( self ):
+		return sublime.load_settings('sqlblime.sublime-settings')
+
+	def textoSelecionado(selections):
+		"""Retorna true se tiver algum texto selecionado"""
+		for selection in selections:
+			if selection.a != selection.b:
+				return True
+			return False
+
+
+
