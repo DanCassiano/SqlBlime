@@ -4,6 +4,9 @@ import json
 import os
 import tempfile
 
+import subprocess
+import threading
+
 """ 
 	api de referencia
 
@@ -173,10 +176,12 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 	def showPainel( self, dados ):
 		self.window = self.view.window()
 		output = self.window.create_output_panel("consulta")
+		
 		output.run_command('erase_view')
 		output.run_command('append', {'characters': dados})
 		output.set_syntax_file("Packages/SQL/SQL.tmLanguage")
-		self.window.run_command("show_panel", {"panel": "output.consulta"})
+
+		self.window.run_command("show_panel", {"panel": "output.consulta"})		
 
 	def loadConfigs( self ):
 		return sublime.load_settings('sqlblime.sublime-settings')
@@ -187,6 +192,8 @@ class  SqlblimeCommand(sublime_plugin.TextCommand):
 			if selection.a != selection.b:
 				return True
 			return False
+	def chamaProcesso(self, processo = 'notepad.exe'):
+		subprocess.call(processo)
 
 
 
